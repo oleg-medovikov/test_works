@@ -61,7 +61,7 @@ let currentPage = 0;
 const itemsPerPage = 100;
 
 // Fetch emails and populate the select
-fetch('http://95.143.188.247:8027/emails')
+fetch('https://medovikov.fun:8027/emails')
   .then(response => response.json())
   .then(emails => {
     const select = document.getElementById('emailSelect');
@@ -88,7 +88,7 @@ document.getElementById('emailSelect').addEventListener('change', function() {
 
 // Fetch messages for a specific email and page
 function fetchMessages(email, page) {
-  fetch('http://95.143.188.247:8027/messages', {
+  fetch('https://medovikov.fun:8027/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

@@ -8,7 +8,7 @@ from typing import List
 
 from base import settings, db
 
-from func import insert_messages
+# from func import insert_messages
 from models import Message, Email, Text
 
 
@@ -29,7 +29,7 @@ def read_root():
 async def startup_event():
     await db.set_bind(settings.pg_url)
     await db.gino.create_all()
-    await insert_messages(settings.file_path)
+    # await insert_messages(settings.file_path)
 
 
 @app.get("/emails", response_model=List[str])
@@ -76,4 +76,6 @@ if __name__ == "__main__":
         port=8027,
         reload=True,
         workers=2,
+        ssl_keyfile=settings.SSL_KEYFILE,
+        ssl_certfile=settings.SSL_CERTFILE,
     )
