@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Single Page Site</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+  #emailSelect {
+    margin-bottom: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    border: 1px solid #000;
+    padding: 5px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+  .pagination {
+    margin-top: 10px;
+  }
+  .pagination button {
+    margin-right: 5px;
+  }
+</style>
+</head>
+<body>
+
+<select id="emailSelect">
+  <!-- Emails will be populated here -->
+</select>
+
+<table id="messageTable">
+  <thead>
+    <tr>
+      <th>Created</th>
+      <th>Text ID</th>
+      <th>Size</th>
+      <th>ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Messages will be populated here -->
+  </tbody>
+</table>
+
+<div class="pagination">
+  <button id="prevPage">Previous</button>
+  <button id="nextPage">Next</button>
+</div>
+
+<script>
+let currentPage = 0;
+const itemsPerPage = 100;
+
+// Fetch emails and populate the select
+fetch('http://95.143.188.247:8027/emails')
+  .then(response => response.json())
+  .then(emails => {
+    const select = document.getElementById('emailSelect');
+    emails.forEach(email => {
+      const option = document.createElement('option');
+      option.value = email;
+      option.text = email;
+      select.add(option);
+    });
+  });
+
+// Handle email selection
+document.getElementById('emailSelect').addEventListener('change', function() {
+  const email = this.value;
+  currentPage = 0;
+  fetchMessages(email, currentPage);
+});
+
+// Fetch messages for a specific email and page
+function fetchMessages(email, page) {
+  fetch('http://95.143.188.247:8027/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, page, itemsPerPage })
+  })
+  .then(response => response.json())
+  .then(messages => {
+    const tableBody = document.querySelector('#messageTable tbody');
+    tableBody.innerHTML = ''; // Clear the table
+    messages.forEach(message => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${message.created}</td>
+        <td>${message.text_id}</td>
+        <td>${message.size}</td>
+        <td>${message.id}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  });
+}
+
+// Handle previous page click
+document.getElementById('prevPage').addEventListener('click', function() {
+  if (currentPage > 0) {
+    currentPage--;
+    const email = document.getElementById('emailSelect').value;
+    fetchMessages(email, currentPage);
+  }
+});
+
+// Handle next page click
+document.getElementById('nextPage').addEventListener('click', function() {
+  currentPage++;
+  const email = document.getElementById('emailSelect').value;
+  fetchMessages(email, currentPage);
+});
+</script>
+
+</body>
+</html>
